@@ -1,0 +1,59 @@
+
+
+
+
+
+
+			
+			
+				/***********************************************************
+		 * Rend le polynome produit de p1 et p2 en utilisant 
+		 * l'algorithme de Karastuba
+		 ***********************************************************/
+		public static Polynomial multiply(Polynomial A, Polynomial B)
+		{
+			PolyInfo Ai			= new PolyInfo(A);
+			PolyInfo Bi			= new PolyInfo(B);
+			if (Ai.isNull || Bi.isNull)	return new Polynomial(0);
+			if (Ai.isMonome) 	return multiplyMonome(B, Ai.monomeCoeff, Ai.monomeDegres);
+			if (Bi.isMonome) 	return multiplyMonome(A, Bi.monomeCoeff, Bi.monomeDegres);
+
+			Polynomial A1		= new Polynomial(0);
+			Polynomial A0		= new Polynomial(0);
+			Polynomial B1		= new Polynomial(0);
+			Polynomial B0		= new Polynomial(0);
+			int n1				= dividePoly(A, A1, A0);
+			int n2				= dividePoly(B, B1, B0);
+			int n				= Math.max(n1, n2);
+
+			Polynomial res1		= multiply(A1, B1);
+			Polynomial res3		= multiply(A0, B0);
+			Polynomial res2		= multiply(add(A0, A1), add(B0, B1));
+			res2				= sub(res2, res3);
+			res2				= sub(res2, res1);
+
+			res1				= multiplyMonome(res1, 1, 2*n);
+			res2				= multiplyMonome(res2, 1, n);
+
+			return add(res1, add(res2, res3));
+		}
+			
+		private static int dividePoly(Polynomial p, Polynomial p1, Polynomial p0)
+		{
+			int min = p.getDegres();
+			int n2	= p.getDegres()+1;
+			while(n2%2 != 0) n2++;
+			int n	= n2/2;
+			p1.coeff.clear();
+			p0.coeff.clear();
+
+			for (int i=0; i<n; i++)
+			{
+				p0.coeff.add(p.coeff.get(i));
+			}
+			for (int i=n; i<=min; i++)
+			{
+				p1.coeff.add(p.coeff.get(i));
+			}
+			return n;
+		}
